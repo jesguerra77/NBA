@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Picks Dashboard - V6.2</title>
+    <style>
+        /* CSS PURO - DISEÑO OSCURO */
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-elite: #22c55e;
+            --accent-fuerte: #3b82f6;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .model-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--text-muted);
+        }
+
+        .game-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+            border-left: 4px solid var(--accent-fuerte);
+            padding-left: 10px;
+        }
+
+        .pick-container {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .pick-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .pick-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--accent-elite);
+        }
+
+        .tier-badge {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .tier-ELITE { background-color: rgba(34, 197, 94, 0.2); color: var(--accent-elite); border: 1px solid var(--accent-elite); }
+        .tier-FUERTE { background-color: rgba(59, 130, 246, 0.2); color: var(--accent-fuerte); border: 1px solid var(--accent-fuerte); }
+
+        .description-box {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .edge-info {
+            font-size: 0.8rem;
+            margin-top: 10px;
+            color: #fbbf24;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="model-info" id="model-tag">MODEL VERSION</div>
+        <h1 id="date-tag">NBA PRONÓSTICOS</h1>
+    </header>
+
+    <main class="dashboard-grid" id="dashboard"></main>
+
+    <footer>
+        &copy; 2026 NBA Analytics Dashboard
+    </footer>
+
+    <script>
+        // Los datos proporcionados
+        const data = {
+            "model_version": "V6.2",
+            "date": "2026-04-07",
+            "picks_dashboard": [
+                {
+                    "game": "Sacramento Kings vs Golden State Warriors",
+                    "picks": [
+                        { "pick": "Over 236.5", "type": "total", "tier": "ELITE", "edge": 7, "description": { "data": "Ambos equipos top pace, defensas permisivas...", "projection": "Partido de ritmo alto estructural" } }
+                    ]
+                },
+                {
+                    "game": "Chicago Bulls vs Washington Wizards",
+                    "picks": [
+                        { "pick": "Over 232.5", "type": "total", "tier": "ELITE", "edge": 6, "description": { "data": "Wizards con una de las peores defensas...", "projection": "Escenario de alta anotación" } },
+                        { "pick": "Wizards OVER 115.5", "type": "team_total", "tier": "FUERTE", "edge": 5, "description": { "data": "Wizards con ritmo alto...", "projection": "Superarán línea por ritmo" } }
+                    ]
+                },
+                {
+                    "game": "Miami Heat vs Toronto Raptors",
+                    "picks": [
+                        { "pick": "Under 219.5", "type": "total", "tier": "ELITE", "edge": 5, "description": { "data": "Heat equipo de ritmo bajo...", "projection": "Partido de control de ritmo" } }
+                    ]
+                },
+                {
+                    "game": "Milwaukee Bucks vs Brooklyn Nets",
+                    "picks": [
+                        { "pick": "Bucks OVER 118.5", "type": "team_total", "tier": "ELITE", "edge": 6, "description": { "data": "Bucks con alta eficiencia...", "projection": "Mismatch ofensivo" } }
+                    ]
+                },
+                {
+                    "game": "Cleveland Cavaliers vs Memphis Grizzlies",
+                    "picks": [
+                        { "pick": "Over 225.5", "type": "total", "tier": "FUERTE", "edge": 4, "description": { "data": "Cavs con explosión ofensiva...", "projection": "Total elevado por eficiencia" } }
+                    ]
+                }
+            ]
+        };
+
+        // Función para renderizar el Dashboard
+        function renderDashboard() {
+            document.getElementById('model-tag').innerText = `Modelo: ${data.model_version}`;
+            document.getElementById('date-tag').innerText = `NBA Pronósticos jornada : ${data.date}`;
+
+            const container = document.getElementById('dashboard');
+
+            data.picks_dashboard.forEach(match => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+
+                let picksHTML = '';
+                match.picks.forEach(p => {
+                    picksHTML += `
+                        <div class="pick-container">
+                            <div class="pick-header">
+                                <span class="pick-value">${p.pick}</span>
+                                <span class="tier-badge tier-${p.tier}">${p.tier}</span>
+                            </div>
+                            <div class="description-box">
+                                <strong>Análisis:</strong> ${p.description.data}<br>
+                                <strong>Proyección:</strong> ${p.description.projection}
+                            </div>
+                            <div class="edge-info">Ventaja (Edge): +${p.edge}%</div>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="game-title">${match.game}</div>
+                    ${picksHTML}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderDashboard();
+    </script>
+</body>
+</html>
