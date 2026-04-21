@@ -3,212 +3,362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Picks Dashboard - V6.2</title>
+    <title>NBA Picks - Panel Analítico</title>
     <style>
-        /* CSS PURO - DISEÑO OSCURO */
+        /* CSS PURO - DISEÑO OSCURO ANALÍTICO */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-elite: #22c55e;
-            --accent-fuerte: #3b82f6;
-            --border: #334155;
+            --bg-base: #0a0a0a;
+            --bg-surface: #141414;
+            --bg-surface-hover: #1f1f1f;
+            --bg-header: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border-color: #27272a;
+            --tier-elite: #10b981; /* Verde esmeralda */
+            --tier-elite-bg: rgba(16, 185, 129, 0.15);
+            --tier-fuerte: #3b82f6; /* Azul */
+            --tier-fuerte-bg: rgba(59, 130, 246, 0.15);
+            --edge-color: #fbbf24; /* Amarillo/Dorado */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
             padding: 20px;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-        }
-
-        .model-info {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
+        /* Encabezado */
+        .dashboard-header {
             max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .game-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
+            margin: 0 auto 30px auto;
             padding: 20px;
-            border: 1px solid var(--border);
-            transition: transform 0.2s;
-        }
-
-        .game-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--text-muted);
-        }
-
-        .game-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #fff;
-            border-left: 4px solid var(--accent-fuerte);
-            padding-left: 10px;
-        }
-
-        .pick-container {
-            background: #0f172a;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .pick-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
         }
 
-        .pick-value {
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Contenedor Principal */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Sección de cada Partido */
+        .game-section {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden; /* Para redondear los bordes de la tabla interior */
+        }
+
+        .game-header {
+            background-color: var(--bg-header);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
             font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--accent-elite);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .tier-badge {
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
+        .game-header::before {
+            content: '🏀';
+            font-size: 1.2rem;
         }
 
-        .tier-ELITE { background-color: rgba(34, 197, 94, 0.2); color: var(--accent-elite); border: 1px solid var(--accent-elite); }
-        .tier-FUERTE { background-color: rgba(59, 130, 246, 0.2); color: var(--accent-fuerte); border: 1px solid var(--accent-fuerte); }
-
-        .description-box {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.4;
+        /* Contenedor responsivo para la tabla */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
         }
 
-        .edge-info {
+        /* Tablas de Picks */
+        .picks-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .picks-table th, 
+        .picks-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .picks-table th {
+            color: var(--text-secondary);
             font-size: 0.8rem;
-            margin-top: 10px;
-            color: #fbbf24;
-            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            background-color: rgba(0, 0, 0, 0.2);
         }
 
-        footer {
+        .picks-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .picks-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .picks-table tbody tr:hover {
+            background-color: var(--bg-surface-hover);
+        }
+
+        /* Celdas específicas */
+        .col-pick {
+            font-weight: 700;
+            font-size: 1.05rem;
+            white-space: nowrap;
+        }
+
+        .col-type {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: capitalize;
+        }
+
+        /* Badges / Etiquetas */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             text-align: center;
-            margin-top: 50px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
+        }
+
+        .badge-elite {
+            color: var(--tier-elite);
+            background-color: var(--tier-elite-bg);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-fuerte {
+            color: var(--tier-fuerte);
+            background-color: var(--tier-fuerte-bg);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .edge-value {
+            color: var(--edge-color);
+            font-weight: 700;
+        }
+
+        .analysis-text {
+            font-size: 0.85rem;
+            color: #d4d4d8;
+            max-width: 400px;
+        }
+
+        .analysis-text strong {
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        /* Responsividad para móviles */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .picks-table th, .picks-table td {
+                padding: 12px 15px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="model-info" id="model-tag">MODEL VERSION</div>
-        <h1 id="date-tag">NBA PRONÓSTICOS</h1>
+    <header class="dashboard-header">
+        <div class="header-title">
+            <h1 id="main-title">Análisis Estratégico Postemporada NBA</h1>
+        </div>
+        <div class="header-meta">
+            <span id="date-display">📅 Ventana: --</span>
+            <span id="model-display">⚙️ Fase: --</span>
+        </div>
     </header>
 
-    <main class="dashboard-grid" id="dashboard"></main>
-
-    <footer>
-        &copy; 2026 NBA Analytics Dashboard
-    </footer>
+    <main class="main-container" id="tables-container">
+        <!-- Las tablas de los partidos se generarán aquí mediante JavaScript -->
+    </main>
 
     <script>
-        // Los datos proporcionados
-        const data = {
-            "model_version": "V6.2",
-            "date": "2026-04-07",
-            "picks_dashboard": [
+        // Datos extraídos EXACTAMENTE del documento "Plan de Investigación NBA_ Picks y Análisis.docx"
+        const docData = {
+            "titulo": "Análisis Estratégico de la Postemporada de la NBA 2026",
+            "ventana": "22 de abril de 2026",
+            "fase": "Primera Ronda",
+            "dashboard_generales": [
                 {
-                    "game": "Sacramento Kings vs Golden State Warriors",
-                    "picks": [
-                        { "pick": "Over 236.5", "type": "total", "tier": "ELITE", "edge": 7, "description": { "data": "Ambos equipos top pace, defensas permisivas...", "projection": "Partido de ritmo alto estructural" } }
-                    ]
+                    "encuentro": "Philadelphia @ Boston",
+                    "favorito": "Celtics -14.5",
+                    "probabilidad": "77.72%",
+                    "pick_moneyline": "Boston (-952)",
+                    "perspectiva": "Boston lidera 1-0; Dominio absoluto"
                 },
                 {
-                    "game": "Chicago Bulls vs Washington Wizards",
-                    "picks": [
-                        { "pick": "Over 232.5", "type": "total", "tier": "ELITE", "edge": 6, "description": { "data": "Wizards con una de las peores defensas...", "projection": "Escenario de alta anotación" } },
-                        { "pick": "Wizards OVER 115.5", "type": "team_total", "tier": "FUERTE", "edge": 5, "description": { "data": "Wizards con ritmo alto...", "projection": "Superarán línea por ritmo" } }
-                    ]
+                    "encuentro": "Portland @ San Antonio",
+                    "favorito": "Spurs -11.5",
+                    "probabilidad": "76.40%",
+                    "pick_moneyline": "San Antonio (-699)",
+                    "perspectiva": "San Antonio lidera 1-0; Ventaja física"
                 },
                 {
-                    "game": "Miami Heat vs Toronto Raptors",
-                    "picks": [
-                        { "pick": "Under 219.5", "type": "total", "tier": "ELITE", "edge": 5, "description": { "data": "Heat equipo de ritmo bajo...", "projection": "Partido de control de ritmo" } }
-                    ]
+                    "encuentro": "Houston @ LA Lakers",
+                    "favorito": "Rockets -4.5",
+                    "probabilidad": "51.60% (LAL)",
+                    "pick_moneyline": "Lakers (+164)",
+                    "perspectiva": "Lakers lideran 1-0; Valor en veteranía"
+                }
+            ],
+            "dashboard_totales": [
+                {
+                    "encuentro": "PHI vs BOS",
+                    "total_ou": "216.5",
+                    "tendencia": "50-33 Under (BOS)",
+                    "seleccion": "Under 216.5",
+                    "justificacion": "Defensa de Boston en casa y falta de anotación en PHI"
                 },
                 {
-                    "game": "Milwaukee Bucks vs Brooklyn Nets",
-                    "picks": [
-                        { "pick": "Bucks OVER 118.5", "type": "team_total", "tier": "ELITE", "edge": 6, "description": { "data": "Bucks con alta eficiencia...", "projection": "Mismatch ofensivo" } }
-                    ]
+                    "encuentro": "POR vs SAS",
+                    "total_ou": "220.5",
+                    "tendencia": "42.7% Over (SAS)",
+                    "seleccion": "Under 220.5",
+                    "justificacion": "Pobre porcentaje de triple de Portland y defensa perimetral Spurs"
                 },
                 {
-                    "game": "Cleveland Cavaliers vs Memphis Grizzlies",
-                    "picks": [
-                        { "pick": "Over 225.5", "type": "total", "tier": "FUERTE", "edge": 4, "description": { "data": "Cavs con explosión ofensiva...", "projection": "Total elevado por eficiencia" } }
-                    ]
+                    "encuentro": "HOU vs LAL",
+                    "total_ou": "206.5",
+                    "tendencia": "42-41 Over (LAL)",
+                    "seleccion": "Under 207.5",
+                    "justificacion": "Ritmo lento de LeBron y ausencia de Doncic/Durant"
                 }
             ]
         };
 
-        // Función para renderizar el Dashboard
-        function renderDashboard() {
-            document.getElementById('model-tag').innerText = `Modelo Johnathan Esguerra : ${data.model_version}`;
-            document.getElementById('date-tag').innerText = `NBA Pronósticos jornada : ${data.date}`;
+        // Función para construir la interfaz basándose en las nuevas tablas
+        function buildDashboard(data) {
+            // Actualizar encabezado
+            document.getElementById('main-title').innerText = data.titulo;
+            document.getElementById('date-display').innerText = `📅 Ventana: ${data.ventana}`;
+            document.getElementById('model-display').innerText = `⚙️ Fase: ${data.fase}`;
 
-            const container = document.getElementById('dashboard');
+            const container = document.getElementById('tables-container');
+            container.innerHTML = ''; // Limpiar contenedor
 
-            data.picks_dashboard.forEach(match => {
-                const card = document.createElement('div');
-                card.className = 'game-card';
-
-                let picksHTML = '';
-                match.picks.forEach(p => {
-                    picksHTML += `
-                        <div class="pick-container">
-                            <div class="pick-header">
-                                <span class="pick-value">${p.pick}</span>
-                                <span class="tier-badge tier-${p.tier}">${p.tier}</span>
-                            </div>
-                            <div class="description-box">
-                                <strong>Análisis:</strong> ${p.description.data}<br>
-                                <strong>Proyección:</strong> ${p.description.projection}
-                            </div>
-                            <div class="edge-info">Ventaja (Edge): +${p.edge}%</div>
-                        </div>
-                    `;
-                });
-
-                card.innerHTML = `
-                    <div class="game-title">${match.game}</div>
-                    ${picksHTML}
+            // --- 1. CONSTRUIR TABLA DE PICKS GENERALES ---
+            const sectionGen = document.createElement('section');
+            sectionGen.className = 'game-section';
+            
+            let rowsGen = '';
+            data.dashboard_generales.forEach(row => {
+                rowsGen += `
+                    <tr>
+                        <td class="col-pick">${row.encuentro}</td>
+                        <td class="col-type">${row.favorito}</td>
+                        <td><span class="badge badge-fuerte">${row.probabilidad}</span></td>
+                        <td class="edge-value">${row.pick_moneyline}</td>
+                        <td class="analysis-text">${row.perspectiva}</td>
+                    </tr>
                 `;
-                container.appendChild(card);
             });
+
+            sectionGen.innerHTML = `
+                <div class="game-header">Dashboard de Picks Generales: Proyecciones de Victoria y Hándicap</div>
+                <div class="table-responsive">
+                    <table class="picks-table">
+                        <thead>
+                            <tr>
+                                <th>Encuentro</th>
+                                <th>Favorito (Hándicap)</th>
+                                <th>Probabilidad de Victoria</th>
+                                <th>Selección de Moneyline</th>
+                                <th>Perspectiva de Serie</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsGen}</tbody>
+                    </table>
+                </div>
+            `;
+            container.appendChild(sectionGen);
+
+            // --- 2. CONSTRUIR TABLA DE PICKS DE TOTALES ---
+            const sectionTot = document.createElement('section');
+            sectionTot.className = 'game-section';
+            
+            let rowsTot = '';
+            data.dashboard_totales.forEach(row => {
+                rowsTot += `
+                    <tr>
+                        <td class="col-pick">${row.encuentro}</td>
+                        <td class="col-type">${row.total_ou}</td>
+                        <td><span class="badge badge-elite">${row.tendencia}</span></td>
+                        <td class="edge-value">${row.seleccion}</td>
+                        <td class="analysis-text">${row.justificacion}</td>
+                    </tr>
+                `;
+            });
+
+            sectionTot.innerHTML = `
+                <div class="game-header">Dashboard de Picks de Totales: Análisis de Over/Under y Ritmo</div>
+                <div class="table-responsive">
+                    <table class="picks-table">
+                        <thead>
+                            <tr>
+                                <th>Encuentro</th>
+                                <th>Total Proyectado (O/U)</th>
+                                <th>Tendencia de la Temporada</th>
+                                <th>Selección de Totales</th>
+                                <th>Justificación Técnica</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsTot}</tbody>
+                    </table>
+                </div>
+            `;
+            container.appendChild(sectionTot);
         }
 
-        renderDashboard();
+        // Ejecutar la función con los datos exactos del documento
+        buildDashboard(docData);
+
     </script>
 </body>
 </html>
